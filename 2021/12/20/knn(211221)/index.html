@@ -20,28 +20,35 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="小鳥遊Takanashi">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="k近邻法概述k近邻（KNN，k-nearest-neighbors）算法是一个直观简单的分类与回归方法：给定一个训练数据集$$T&#x3D;{(x_1, y_1), (x_2, y_2), \cdots, (x_N, y_N)},$$其中$x_i\in \mathbb{R}^n$为实例的特征向量，$y\in{c_1,c_2,\cdots,c_K}$为实例的类别，$N$为实例数目，$K$为类别数目，$n$为特">
+<meta property="og:type" content="article">
+<meta property="og:title" content="统计学习方法代码复现 | 第3章：k近邻法">
+<meta property="og:url" content="http://example.com/2021/12/20/knn(211221)/index.html">
 <meta property="og:site_name" content="小鳥遊Takanashi">
+<meta property="og:description" content="k近邻法概述k近邻（KNN，k-nearest-neighbors）算法是一个直观简单的分类与回归方法：给定一个训练数据集$$T&#x3D;{(x_1, y_1), (x_2, y_2), \cdots, (x_N, y_N)},$$其中$x_i\in \mathbb{R}^n$为实例的特征向量，$y\in{c_1,c_2,\cdots,c_K}$为实例的类别，$N$为实例数目，$K$为类别数目，$n$为特">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/post/KNN/1.png">
+<meta property="og:image" content="http://example.com/images/post/KNN/2.jpg">
+<meta property="article:published_time" content="2021-12-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-21T15:36:33.772Z">
 <meta property="article:author" content="小鳥遊Takanashi">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/post/KNN/1.png">
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/2021/12/20/knn(211221)/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>小鳥遊Takanashi</title>
+  <title>统计学习方法代码复现 | 第3章：k近邻法 | 小鳥遊Takanashi</title>
   
 
 
@@ -184,9 +191,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -202,10 +210,9 @@
       <meta itemprop="name" content="小鳥遊Takanashi">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/20/knn(211221)/" class="post-title-link" itemprop="url">统计学习方法代码复现 | 第3章：k近邻法</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          统计学习方法代码复现 | 第3章：k近邻法
+        </h1>
 
         <div class="post-meta">
           
@@ -225,7 +232,14 @@
                 <time title="修改时间：2021-12-21 23:36:33" itemprop="dateModified" datetime="2021-12-21T23:36:33+08:00">2021-12-21</time>
               </span>
 
-          <br>
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
             <span class="post-meta-item" title="本文字数">
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
@@ -250,7 +264,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="k近邻法概述"><a href="#k近邻法概述" class="headerlink" title="k近邻法概述"></a>k近邻法概述</h1><p>k近邻（KNN，k-nearest-neighbors）算法是一个直观简单的分类与回归方法：给定一个训练数据集<br>$$T={(x_1, y_1), (x_2, y_2), \cdots, (x_N, y_N)},$$<br>其中$x_i\in \mathbb{R}^n$为实例的特征向量，$y\in{c_1,c_2,\cdots,c_K}$为实例的类别，$N$为实例数目，$K$为类别数目，$n$为特征向量维度；对新的输入实例$x$，该算法预测输出$x$所属的类$y$。</p>
+        <h1 id="k近邻法概述"><a href="#k近邻法概述" class="headerlink" title="k近邻法概述"></a>k近邻法概述</h1><p>k近邻（KNN，k-nearest-neighbors）算法是一个直观简单的分类与回归方法：给定一个训练数据集<br>$$T={(x_1, y_1), (x_2, y_2), \cdots, (x_N, y_N)},$$<br>其中$x_i\in \mathbb{R}^n$为实例的特征向量，$y\in{c_1,c_2,\cdots,c_K}$为实例的类别，$N$为实例数目，$K$为类别数目，$n$为特征向量维度；对新的输入实例$x$，该算法预测输出$x$所属的类$y$。</p>
 <p>k近邻模型由三个基本要素决定：<strong>距离度量</strong>，<strong>k值的选择</strong>以及<strong>分类决策规则</strong>。</p>
 <ol>
 <li><p><strong>距离度量</strong>：两个实例点$x_i$和$x_j$间的距离。通常使用欧氏距离：<br>$$L_2(x_i,x_j)=\sqrt{\sum_{k=1}^{n}(x_i^{(k)}-x_j^{(k)})^2}$$<br>其它类型的距离详见课本。</p>
@@ -284,27 +298,80 @@
 <p><img src="/images/post/KNN/2.jpg" alt="图2"></p>
 <p>这部分感兴趣的同学可以去看看<a target="_blank" rel="noopener" href="https://www.cnblogs.com/zhengxingpeng/p/6670451.html">这篇博客</a>的对球树的介绍，其思想与kd树是类似的，咱就点到为止。</p>
 
-      
     </div>
 
     
     
     
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>小鳥遊Takanashi
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2021/12/20/knn(211221)/" title="统计学习方法代码复现 | 第3章：k近邻法">http://example.com/2021/12/20/knn(211221)/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/images/wechat_channel.jpg">
+            <span class="icon">
+              <i class="fab fa-weixin"></i>
+            </span>
+
+            <span class="label">WeChat</span>
+          </a>
+        </div>
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
+
+        
+
+
+        
       </footer>
+    
   </article>
   
   
   
 
 
-  
-
-
 
           </div>
           
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC81NDk4OC8zMTQ1Nw=="></div>
+  </div>
+  
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -351,6 +418,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#k%E8%BF%91%E9%82%BB%E6%B3%95%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">k近邻法概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">算法设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BA%BF%E6%80%A7%E6%89%AB%E6%8F%8F"><span class="nav-number">2.1.</span> <span class="nav-text">最简单的方法：线性扫描</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E9%AB%98%E6%95%88%E7%9A%84%E6%96%B9%E6%B3%95%EF%BC%9Akd%E6%A0%91"><span class="nav-number">2.2.</span> <span class="nav-text">更高效的方法：kd树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%953-4%EF%BC%88%E7%94%A8kd%E6%A0%91%E7%9A%84k%E8%BF%91%E9%82%BB%E6%90%9C%E7%B4%A2%EF%BC%89"><span class="nav-number">2.2.1.</span> <span class="nav-text">算法3.4（用kd树的k近邻搜索）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.2.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">2.2.3.</span> <span class="nav-text">时间复杂度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E5%AF%B9%E9%AB%98%E7%BB%B4%E6%95%B0%E6%8D%AE%E7%9A%84%E6%96%B9%E6%B3%95%EF%BC%9A%E7%90%83%E6%A0%91%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.</span> <span class="nav-text">应对高维数据的方法：球树模型</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -585,6 +653,21 @@ $(document).ready(function() {
 
   
 
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/shizuku.model.json"},"display":{"position":"left","width":140,"height":280},"mobile":{"show":true},"react":{"opacity":1},"log":false});</script></body>
 </html>
